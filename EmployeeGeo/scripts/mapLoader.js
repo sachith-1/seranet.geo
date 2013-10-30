@@ -54,7 +54,7 @@ function loadtoMap(mapArray) {
             map: map,
             title: (mapArray[i].name + ' :' + "  " + mapArray[i].address),
             animation: google.maps.Animation.DROP,
-            icon: '../images/geoicon.png',
+            icon: '/images/geoicon.png',
 
 
             labelname: mapArray[i].name,
