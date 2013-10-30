@@ -1,0 +1,181 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>99X Employee Geo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="styles/bootmetro.css" rel="stylesheet" />
+    <link href="styles/custom.css" rel="stylesheet" />
+   
+    <!--scripts-->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="scripts/jquery-1.7.2.min.js"></script>
+    <script src="scripts/bootstrap.js"></script>
+    <script src="scripts/bootstrap.min.js"><link href="styles/custom.css" rel="stylesheet" /></script>
+    <script src="scripts/jquery-1.8.2.js"></script>
+    <!--project menu-->
+    <script src="scripts/ddslick.js"></script>
+    <!--<script src="scripts/filterAddress.js"></script>-->
+    <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <!--map-->
+    <script src="scripts/mapLoader.js"></script>
+    <!--<script src="scripts/testgeo.js"></script>-->
+</head>
+<body>
+    <div class="hero-unit">
+        <h1>Employee GEO</h1>
+        <p>Find the geographical location of your team</p>
+
+        <div id="projectDrop">
+        </div>
+
+        <div class="optionsButtons">
+            <button id="perm" class="btn btn-primary" value="click" ">Permanent Address</button>
+            <button id="temp" class="btn btn-primary" value="click" ">Temporary Address</button>
+        </div>
+    </div>
+    <div id="map_canvas"></div>
+
+    <script>
+
+        //var ProjNames = [
+        //  {
+        //      text: "CloudHub",
+        //      value: 1,
+        //      selected: false,
+        //      imageSrc: "images/adraicon.png"
+
+        //  },
+
+        //  {
+        //      text: "PuzzlePart",
+        //      value: 2,
+        //      selected: false,
+        //      imageSrc: "images/corenaicon.png"
+        //  },
+
+        //  {
+        //      text: "Centric",
+        //      value: 3,
+        //      selected: false,
+        //      imageSrc: "images/centricicon.png"
+        //  }
+
+
+        //]
+
+
+        var projects;
+        $.ajax({
+            url: './server/newProjects.js',
+            dataType: 'json',
+            success: function (data) {
+                console.log("new" + data);
+                console.log(data[0].name);
+                projects = data;
+                console.log(projects);
+            }
+        });
+
+        //var empPermArray = [];
+        //var empTempArray = [];
+        $('#projectDrop').ddslick({
+
+            data: './server/newProjects.js',
+            width: 300,
+            selectText: "Select Project",
+            onSelected: function (selectedData) {
+                var empPermArray = [];
+                var empTempArray = [];
+                console.log(selectedData.selectedIndex);
+                $.ajax({
+                    url: './server/newProjects.js',
+                    dataType: 'json',
+                    success: function (data) {
+                        console.log(data);
+                        var array = data[selectedData.selectedIndex].members;
+                        console.log(array);
+                      
+
+                        $.ajax({
+                            url: './server/newEmployees.js',
+                            dataType: 'json',
+                            success: function (data) {
+
+                                //console.log(data);
+
+                                for (var i = 0; i < array.length; i++) {
+                                    for (var j = 0; j < data.length; j++) {
+
+                                        if (array[i].toString() == (data[j].id).toString()) {
+                                            console.log("for loop" + data[j].firstName);
+                                            //load data to employee permanent array
+                                            var employee = {};
+
+                                            employee.name = (data[j].firstName);
+
+                                            var num = (data[j].addresses[1].number);
+                                            var street = (data[j].addresses[1].street);
+                                            var city = (data[j].addresses[1].city);
+                                            var district = (data[j].addresses[1].district);
+                                            employee.cordinates = (data[j].addresses[1].coordinate);
+
+
+                                            employee.address = (num + ", " + street + ", " + city + ", " + district);
+                                            console.log(employee.address);
+                                            console.log(employee.cordinates);
+                                            empPermArray.push(employee);
+
+
+                                            //load data to employee residential array
+                                            var employeeTemp = {};
+
+                                            employeeTemp.name = (data[j].firstName);
+
+                                            var num = (data[j].addresses[0].number);
+                                            var street = (data[j].addresses[0].street);
+                                            var city = (data[j].addresses[0].city);
+                                            var district = (data[j].addresses[0].district);
+                                            employeeTemp.cordinates = (data[j].addresses[0].coordinate);
+
+
+                                            employeeTemp.address = (num + ", " + street + ", " + city + ", " + district);
+                                            empTempArray.push(employeeTemp);
+
+                                            //on button clicks
+                                            perm.addEventListener("click", function () {
+                                                console.log("Perm" + empPermArray);
+                                                test(empPermArray);
+                                                
+                                            });
+
+                                            temp.addEventListener("click", function () {
+                                                console.log("Temp" + empTempArray);
+                                                test(empTempArray);
+                                            });
+                                        }
+
+                                    }
+
+                                }
+                            }
+                        });
+
+
+                    }
+                });
+            }
+        });
+
+        $(function () {
+            $('.hero-unit').width($(window).width() - 140);
+            $(window).resize(function () {
+                $('.hero-unit').width($(window).width() - 140);
+            });
+
+        });
+
+    </script>
+</body>
+</html>
+

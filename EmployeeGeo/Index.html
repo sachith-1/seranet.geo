@@ -1,0 +1,315 @@
+﻿<!DOCTYPE html>
+
+<html class="no-js">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>99X Employee Geo</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Default CSS -->
+    <link rel="stylesheet" href="styles/normalize.css">
+    <link rel="stylesheet" href="styles/main.css">
+
+    <!-- Bootstrap -->
+    <!--<link href="styles/bootmetro.css" rel="stylesheet" />-->
+
+    <!-- Custom CSS -->
+    <link href="styles/custom.css" rel="stylesheet" />
+
+    <script src="scripts/vendor/modernizr-2.6.2.min.js"></script>
+    <script src="scripts/MultiSelect.js"></script>
+
+</head>
+<body>
+
+    <!--[if lt IE 7]>
+        <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <div class="hero-unit clearfix shadow">
+        <div id="leftSide">
+            <h1>Employee GEO</h1>
+            <p>Find the geographical location of your team</p>
+        </div>
+        <link href="styles/MultiSelect.css" rel="stylesheet" />
+        <div id="rightSide" class="clearfix">
+            <div id="projectDrop" class="MultiSelect">
+                <ul id="projectsMenu" class="MultiSelect" tabindex="1"><b>Select Project</b></ul>
+
+                <div id="wrapper">
+                                  
+                <a id="all" class="linkStyle" href="#"  style="float:left;margin-top:50px" onclick="selectAll(); " >Select All</a>
+                <a id="clear" class="linkStyle" href="#"  style="float:left;margin-top:50px;padding-left:120px" onclick="clearAll(); " >Reset</a>
+                    
+            </div>
+            </div>
+            
+            <script src="scripts/vendor/mul.js"></script>
+
+            <div class="optionsButtons">
+                <button id="perm" class="btn btn-primary" value="click">Permanent Address</button>
+                <button id="temp" class="btn btn-primary" value="click">Residential Address</button>
+            </div>
+           
+            
+        </div>
+    </div>
+    <div id="map_canvas">
+    </div>
+
+    <script src="scripts/jquery-1.8.2.js"></script>
+
+    <!--scripts
+    <script src="scripts/bootstrap.js"></script>
+    <script src="scripts/bootstrap.min.js"></script>
+    -->
+    <script src="scripts/colors.js"></script>
+    <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <script src="scripts/vendor/label.js"></script>
+
+
+
+    <!--map-->
+    <script src="scripts/mapLoader.js"></script>
+
+    <script>
+        $('#projectsMenu').on(
+      {
+          mouseover: function () {
+              $(this).find('li').slideDown();
+          },
+
+          mouseleave: function () {
+              $(this).find('li').slideUp();
+          }
+      }
+      );
+
+
+        var selectAll = function () {
+            console.log("click");
+            $(".checkboxes").attr('checked', true);
+            $("#clear").attr('checked', false);
+        }
+
+        var clearAll = function () {
+
+            $(".checkboxes").attr('checked', false);
+            $("#all").attr('checked', false);
+            // var arrayClear = [];
+            clear();
+
+        }
+
+        //load project json
+        var projects = {};
+        $.ajax({
+            url: 'http://99xtechnology.lk/services/api/projects',
+            dataType: 'json',
+            success: function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    var project = data[i];
+                   // project.color = getColor(i);
+                    //ensure id is lowercase
+                    project.name = project.name.toLowerCase();
+                    //lowercase members
+                    var lowerMembers = [];
+                    for (var j = 0; j < project.members.length; j++) {
+                        lowerMembers.push(project.members[j].toLowerCase());
+                    }
+                    project.members = lowerMembers;
+
+                    //set indexed property of teh collection
+                    projects[data[i].name] = data[i];
+
+                }
+                createMenu();
+            }
+        });
+
+        //load employee json
+        var employees = {};
+        $.ajax({
+            url: 'http://99xtechnology.lk/services/api/employees',
+            dataType: 'json',
+            success: function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    data[i].id = data[i].id.toLowerCase();
+                    employees[data[i].id] = data[i];
+                }
+            }
+        });
+
+
+
+        // create menu
+        var createMenu = function () {
+            for (var index in projects) {
+                var project = projects[index];
+                var menuItem = $('<li><a class=""> <input name="projectchk" type="checkbox" class="checkboxes" value="' + project.name + '"> <label style="color:' + project.color + '" class="" >' + project.name + '</label></a></li>');
+                $('#projectsMenu').append(menuItem);
+                //to add image :  <img class="" src="images/adraicon.png">
+            }
+        }
+
+
+
+        //get selected project names from the list
+        var getSelectedProjects = function () {
+            var checked = [];
+            $("input[name='projectchk']:checked").each(function () {
+                checked.push($(this).val());
+            });
+            appendfooter(checked);
+            return checked;
+        }
+
+
+
+        //get employees of selected projects
+        var getEmployees = function (selectedProjects) {
+
+            var selectedEmployees = {};
+            var errors = [];
+            for (var i = 0; i < selectedProjects.length; ++i) {
+                var project = projects[selectedProjects[i]];
+
+                for (var j = 0; j < project.members.length; j++) {
+
+                    var empId = project.members[j];
+
+                    selectedEmployees[empId] = employees[empId];
+
+
+                    //check for conflicts
+                    if (typeof selectedEmployees[empId] !== "undefined") {
+                    //    selectedEmployees[empId].color = project.color;
+                        selectedEmployees[empId] == null;
+
+                    }
+
+                    else {
+                        errors.push(empId + " ");
+                        //  alert(empId + " "+ "Not Found!");
+                    }
+                }
+            }
+            showerrors(errors);
+            //  console.log(selectedEmployees);
+            return selectedEmployees;
+        }
+
+
+        //return employee object with name, address and cordinates
+        var getMapFriendlyEmpList = function (employees, type) {
+
+            var mapFriendlyObjs = [];
+
+            for (var i in employees) {
+
+                var employee = {};
+                if (typeof employees[i] !== "undefined") {
+                    employee.name = employees[i].firstName;
+                    var num = employees[i].addresses[type].number;
+                    var street = employees[i].addresses[type].street;
+                    var city = employees[i].addresses[type].city;
+                    var district = employees[i].addresses[type].district;
+                    employee.address = num + " " + street + " " + city + " " + district;
+                    employee.coordinate = employees[i].addresses[type].coordinate;
+
+                    mapFriendlyObjs.push(employee);
+                }
+
+            }
+            return mapFriendlyObjs;
+        }
+
+        var showerrors = function (errors) {
+            console.log("err" + errors.toString());
+           // alert(errors.toString() + " " + "Not Found");
+        }
+        //on permanent address click
+        $('#perm').click(function () {
+
+            $('#temp').removeClass('highlightButton');
+
+            if ($(this).hasClass('highlightButton')) {
+                $(this).removeClass('highlightButton');
+            }
+            else
+                $(this).addClass('highlightButton');
+
+
+            var selectedProjects = getSelectedProjects();
+
+            var employees = getEmployees(selectedProjects);
+
+            var mapFriendlyEmpList = getMapFriendlyEmpList(employees, 1);
+
+            loadtoMap(mapFriendlyEmpList);
+        });
+
+
+        //on residential address click
+        $('#temp').click(function () {
+
+
+            $('#perm').removeClass('highlightButton');
+
+            if ($(this).hasClass('highlightButton')) {
+                $(this).removeClass('highlightButton')
+            }
+            else
+                $(this).addClass('highlightButton');
+
+
+            var selectedProjects = getSelectedProjects();
+
+            var employees = getEmployees(selectedProjects);
+
+            var mapFriendlyEmpList = getMapFriendlyEmpList(employees, 0);
+
+            loadtoMap(mapFriendlyEmpList);
+        });
+
+
+        // window resizing
+        $(function () {
+            resizeDiv()
+            $(document).resize(function () {
+                resizeDiv();
+            });
+
+            function resizeDiv() {
+                var windowHeight = $(document).height();
+                $('#map_canvas').height(windowHeight - 89);
+            }
+        });
+
+
+        //window.onload = appendfooter;
+        function appendfooter(selectedprojects) {
+            var names = selectedprojects;
+            console.log(selectedprojects);
+            //    $('#footer').appendTo('<div style="width:100%">"+selectedprojects+"</div>');
+            $('<p>project</p>').appendTo('#footer');
+        }
+
+
+        function appendfooter(selectedprojects) {
+
+            var footer = "<div style='position:fixed;bottom:0px;background-color:darkseagreen;width:100%;height:50px'><b>Selected Projects :  </b>" + selectedprojects + "</div>"
+            $("body").append(footer);
+        }
+        window.onload = appendfooter("None");
+    </script>
+
+
+    <!--<div id="footer" style='position:fixed;bottom:0px;background-color:darkseagreen;width:100%;height:50px'>
+      
+    </div>-->
+</body>
+</html>
