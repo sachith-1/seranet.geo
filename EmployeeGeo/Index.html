@@ -198,8 +198,8 @@
                     }
                 }
             }
-            showerrors(errors);
-            //  console.log(selectedEmployees);
+            var errorNames = showerrors(errors);
+            appendfooter(selectedProjects, errorNames);
             return selectedEmployees;
         }
 
@@ -228,9 +228,11 @@
             return mapFriendlyObjs;
         }
 
+
         var showerrors = function (errors) {
             console.log("err" + errors.toString());
-           // alert(errors.toString() + " " + "Not Found");
+
+            return errors;
         }
         //on permanent address click
         $('#perm').click(function () {
@@ -300,12 +302,12 @@
         }
 
 
-        function appendfooter(selectedprojects) {
+        function appendfooter(selectedprojects, errorNames) {
 
-            var footer = "<div style='position:fixed;bottom:0px;background-color:darkseagreen;width:100%;height:50px'><b>Selected Projects :  </b>" + selectedprojects + "</div>"
+            var footer = "<div style='position:fixed;bottom:0px;background-color:darkseagreen;width:100%;height:70px'><b>Selected Projects :  </b>" + selectedprojects + " </br> <b style=color:red>Identity Mismatch :<b> " + errorNames + "</div>"
             $("body").append(footer);
         }
-        window.onload = appendfooter("None");
+        window.onload = appendfooter("None", "None");
     </script>
 
 
