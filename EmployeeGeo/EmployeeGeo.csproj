@@ -62,6 +62,8 @@
     <Content Include="images\centricicon.png" />
     <Content Include="images\corenaicon.png" />
     <Content Include="images\geoicon.png" />
+    <Content Include="scripts\bootstrap-3.0.0.min.js" />
+    <Content Include="scripts\bootstrap-multiselect.js" />
     <Content Include="scripts\bootstrap.js" />
     <Content Include="scripts\bootstrap.min.js" />
     <Content Include="scripts\loadAddress.js" />

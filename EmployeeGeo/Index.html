@@ -13,15 +13,20 @@
     <!-- Default CSS -->
     <link rel="stylesheet" href="styles/normalize.css">
     <link rel="stylesheet" href="styles/main.css">
+    
 
     <!-- Bootstrap -->
+    <link rel="stylesheet" href="styles/bootstrap-3.0.0.min.css" type="text/css">
+    <link rel="stylesheet" href="styles/bootstrap-multiselect.css" type="text/css">
+
+    
     <!--<link href="styles/bootmetro.css" rel="stylesheet" />-->
 
     <!-- Custom CSS -->
     <link href="styles/custom.css" rel="stylesheet" />
 
     <script src="scripts/vendor/modernizr-2.6.2.min.js"></script>
-    <script src="scripts/MultiSelect.js"></script>
+    <!--<script src="scripts/MultiSelect.js"></script>-->
 
 </head>
 <body>
@@ -35,24 +40,28 @@
             <h1>Employee GEO</h1>
             <p>Find the geographical location of your team</p>
         </div>
-        <link href="styles/MultiSelect.css" rel="stylesheet" />
+       <!-- <link href="styles/MultiSelect.css" rel="stylesheet" />-->
         <div id="rightSide" class="clearfix">
             <div id="projectDrop" class="MultiSelect">
-                <ul id="projectsMenu" class="MultiSelect" tabindex="1"><b>Select Project</b></ul>
+                
+                
+                <select id="projectsMenu" multiple="multiple"></select>
 
-                <div id="wrapper">
+                <!--<div id="wrapper">
                                   
                 <a id="all" class="linkStyle" href="#"  style="float:left;margin-top:50px" onclick="selectAll(); " >Select All</a>
                 <a id="clear" class="linkStyle" href="#"  style="float:left;margin-top:50px;padding-left:120px" onclick="clearAll(); " >Reset</a>
                     
-            </div>
+            </div>-->
             </div>
             
-            <script src="scripts/vendor/mul.js"></script>
+            <!--<script src="scripts/vendor/mul.js"></script>-->
 
-            <div class="optionsButtons">
+            <div class="optionsButtons clearfix">
                 <button id="perm" class="btn btn-primary" value="click">Permanent Address</button>
                 <button id="temp" class="btn btn-primary" value="click">Residential Address</button>
+                
+                <a id="clear" class="linkStyle btn-primary-red" href="#" onclick="clearAll(); " >Reset</a>
             </div>
            
             
@@ -62,7 +71,18 @@
     </div>
 
     <script src="scripts/jquery-1.8.2.js"></script>
-
+ 
+ 	<!-- Boots trap -->
+ 	<script type="text/javascript" src="scripts/bootstrap-3.0.0.min.js"></script>
+	<script type="text/javascript" src="scripts/bootstrap-multiselect.js"></script>
+    <script type="text/javascript" src="scripts/prettify.js"></script>
+    
+    <script type="text/javascript">
+        /*$('#projectsMenu').multiselect({
+			includeSelectAllOption: true
+		});*/
+    </script>
+    
     <!--scripts
     <script src="scripts/bootstrap.js"></script>
     <script src="scripts/bootstrap.min.js"></script>
@@ -77,6 +97,9 @@
     <script src="scripts/mapLoader.js"></script>
 
     <script>
+
+
+
         $('#projectsMenu').on(
       {
           mouseover: function () {
@@ -86,20 +109,27 @@
           mouseleave: function () {
               $(this).find('li').slideUp();
           }
+
+
+
+
+
       }
       );
+        //$('#projectsMenu').onclick(function () {
+        //    $(this).toggle();
+        //});
 
-
-        var selectAll = function () {
-            console.log("click");
-            $(".checkboxes").attr('checked', true);
-            $("#clear").attr('checked', false);
-        }
+        //var selectAll = function () {
+        //    console.log("click");
+        //    $(".checkbox").attr('checked', true);
+        //   // $("#clear").attr('checked', false);
+        //}
 
         var clearAll = function () {
 
-            $(".checkboxes").attr('checked', false);
-            $("#all").attr('checked', false);
+            $(".projectchk").attr('checked', false);
+            //  $("#all").attr('checked', false);
             // var arrayClear = [];
             clear();
 
@@ -113,7 +143,7 @@
             success: function (data) {
                 for (var i = 0; i < data.length; i++) {
                     var project = data[i];
-                   // project.color = getColor(i);
+                    // project.color = getColor(i);
                     //ensure id is lowercase
                     project.name = project.name.toLowerCase();
                     //lowercase members
@@ -150,10 +180,15 @@
         var createMenu = function () {
             for (var index in projects) {
                 var project = projects[index];
-                var menuItem = $('<li><a class=""> <input name="projectchk" type="checkbox" class="checkboxes" value="' + project.name + '"> <label style="color:' + project.color + '" class="" >' + project.name + '</label></a></li>');
-                $('#projectsMenu').append(menuItem);
+                //var menuItem = $('<option value="'+project.name+'">'+project.name+'</option>');
+                $('#projectsMenu').append($('<option class="check"></option>').attr('value', project.name).text(project.name));
                 //to add image :  <img class="" src="images/adraicon.png">
-            }
+            };
+            $('#projectsMenu').multiselect({
+                includeSelectAllOption: true,
+                buttonWidth: '200px',
+                maxHeight: 300,
+            });
         }
 
 
@@ -162,7 +197,10 @@
         var getSelectedProjects = function () {
             var checked = [];
             $("input[name='projectchk']:checked").each(function () {
-                checked.push($(this).val());
+
+                if ($(this).val() !== 'multiselect-all') {
+                    checked.push($(this).val());
+                }
             });
             appendfooter(checked);
             return checked;
@@ -187,7 +225,7 @@
 
                     //check for conflicts
                     if (typeof selectedEmployees[empId] !== "undefined") {
-                    //    selectedEmployees[empId].color = project.color;
+                        //    selectedEmployees[empId].color = project.color;
                         selectedEmployees[empId] == null;
 
                     }
@@ -198,8 +236,8 @@
                     }
                 }
             }
-            var errorNames = showerrors(errors);
-            appendfooter(selectedProjects, errorNames);
+            showerrors(errors);
+            //  console.log(selectedEmployees);
             return selectedEmployees;
         }
 
@@ -228,11 +266,10 @@
             return mapFriendlyObjs;
         }
 
-
         var showerrors = function (errors) {
             console.log("err" + errors.toString());
-
-            return errors;
+            return "errors";
+            // alert(errors.toString() + " " + "Not Found");
         }
         //on permanent address click
         $('#perm').click(function () {
@@ -302,9 +339,9 @@
         }
 
 
-        function appendfooter(selectedprojects, errorNames) {
+        function appendfooter(selectedprojects, showerrors) {
 
-            var footer = "<div style='position:fixed;bottom:0px;background-color:darkseagreen;width:100%;height:70px'><b>Selected Projects :  </b>" + selectedprojects + " </br> <b style=color:red>Identity Mismatch :<b> " + errorNames + "</div>"
+            var footer = "<div id='footerDivPro'><p><b>Selected Projects :  </b>" + selectedprojects + "</p><p><b> Identity Mismatch : </b>" + showerrors + "</p></div>"
             $("body").append(footer);
         }
         window.onload = appendfooter("None", "None");
