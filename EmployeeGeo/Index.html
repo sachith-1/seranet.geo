@@ -57,234 +57,236 @@
     </div>
     <div id="map_canvas">
     </div>
+    <div id='footerDivPro'></div>
 
-    <script src="scripts/jquery-1.8.2.js"></script>
- 
- 	<!-- Boots trap -->
- 	<script type="text/javascript" src="scripts/bootstrap-3.0.0.min.js"></script>
-	<script type="text/javascript" src="scripts/bootstrap-multiselect.js"></script>
-    <!--<script type="text/javascript" src="scripts/prettify.js"></script>-->
-    
-    <script type="text/javascript">
-     
-    </script>
-  
-    <script src="scripts/colors.js"></script>
-    <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
-    <script src="scripts/vendor/label.js"></script>
+        <script src="scripts/jquery-1.8.2.js"></script>
 
-    <!--map-->
-    <script src="scripts/mapLoader.js"></script>
+        <!-- Boots trap -->
+        <script type="text/javascript" src="scripts/bootstrap-3.0.0.min.js"></script>
+        <script type="text/javascript" src="scripts/bootstrap-multiselect.js"></script>
+        <!--<script type="text/javascript" src="scripts/prettify.js"></script>-->
 
-    <script>
+        <script type="text/javascript">
 
-        var clearAll = function () {
+        </script>
 
-            $(".checkbox").attr('checked', false);
-          
-            clear();
+        <script src="scripts/colors.js"></script>
+        <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+        <script src="scripts/vendor/label.js"></script>
 
-        }
+        <!--map-->
+        <script src="scripts/mapLoader.js"></script>
 
-        //load project json
-        var projects = {};
-        $.ajax({
-            url: 'http://99xtechnology.lk/services/api/projects',
-            dataType: 'json',
-            success: function (data) {
-                for (var i = 0; i < data.length; i++) {
-                    var project = data[i];
-                    // project.color = getColor(i);
-                    //ensure id is lowercase
-                    project.name = project.name.toLowerCase();
-                    //lowercase members
-                    var lowerMembers = [];
+        <script>
+
+            var clearAll = function () {
+
+                $(".checkbox").attr('checked', false);
+
+                clear();
+
+            }
+
+            //load project json
+            var projects = {};
+            $.ajax({
+                url: 'http://99xtechnology.lk/services/api/projects',
+                dataType: 'json',
+                success: function (data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var project = data[i];
+                        // project.color = getColor(i);
+                        //ensure id is lowercase
+                        project.name = project.name.toLowerCase();
+                        //lowercase members
+                        var lowerMembers = [];
+                        for (var j = 0; j < project.members.length; j++) {
+                            lowerMembers.push(project.members[j].toLowerCase());
+                        }
+                        project.members = lowerMembers;
+
+                        //set indexed property of teh collection
+                        projects[data[i].name] = data[i];
+
+                    }
+                    createMenu();
+                }
+            });
+
+            //load employee json
+            var employees = {};
+            $.ajax({
+                url: 'http://99xtechnology.lk/services/api/employees',
+                dataType: 'json',
+                success: function (data) {
+                    for (var i = 0; i < data.length; i++) {
+                        data[i].id = data[i].id.toLowerCase();
+                        employees[data[i].id] = data[i];
+                    }
+                }
+            });
+
+
+
+            // create menu
+            var createMenu = function () {
+                for (var index in projects) {
+                    var project = projects[index];
+
+                    $('#projectsMenu').append($('<option></option>').attr('value', project.name).text(project.name));
+
+                    //to add image :  <img class="" src="images/adraicon.png">
+                };
+                $('#projectsMenu').multiselect({
+                    includeSelectAllOption: true,
+                    buttonWidth: '200px',
+                    maxHeight: 300,
+                });
+            }
+
+
+
+            //get selected project names from the list
+            var getSelectedProjects = function () {
+                var checked = [];
+                $("input[name='projectchk']:checked").each(function () {
+
+                    if ($(this).val() !== 'multiselect-all') {
+                        checked.push($(this).val());
+                    }
+                });
+                appendfooter(checked);
+                return checked;
+            }
+
+
+            //get employees of selected projects
+            var getEmployees = function (selectedProjects) {
+
+                var selectedEmployees = {};
+                var errors = [];
+                for (var i = 0; i < selectedProjects.length; ++i) {
+                    var project = projects[selectedProjects[i]];
+
                     for (var j = 0; j < project.members.length; j++) {
-                        lowerMembers.push(project.members[j].toLowerCase());
-                    }
-                    project.members = lowerMembers;
+                        var empId = project.members[j];
+                        selectedEmployees[empId] = employees[empId];
 
-                    //set indexed property of teh collection
-                    projects[data[i].name] = data[i];
+                        //check for conflicts
+                        if (typeof selectedEmployees[empId] !== "undefined") {
+                            //    selectedEmployees[empId].color = project.color;
+                            selectedEmployees[empId] == null;
+                        }
 
-                }
-                createMenu();
-            }
-        });
-
-        //load employee json
-        var employees = {};
-        $.ajax({
-            url: 'http://99xtechnology.lk/services/api/employees',
-            dataType: 'json',
-            success: function (data) {
-                for (var i = 0; i < data.length; i++) {
-                    data[i].id = data[i].id.toLowerCase();
-                    employees[data[i].id] = data[i];
-                }
-            }
-        });
-
-
-
-        // create menu
-        var createMenu = function () {
-            for (var index in projects) {
-                var project = projects[index];
-              
-                $('#projectsMenu').append($('<option></option>').attr('value', project.name).text(project.name));
-               
-                //to add image :  <img class="" src="images/adraicon.png">
-            };
-            $('#projectsMenu').multiselect({
-                includeSelectAllOption: true,
-                buttonWidth: '200px',
-                maxHeight: 300,
-            });
-        }
-
-
-
-        //get selected project names from the list
-        var getSelectedProjects = function () {
-            var checked = [];
-            $("input[name='projectchk']:checked").each(function () {
-
-                if ($(this).val() !== 'multiselect-all') {
-                    checked.push($(this).val());
-                }
-            });
-            appendfooter(checked);
-            return checked;
-        }
-
-
-        //get employees of selected projects
-        var getEmployees = function (selectedProjects) {
-
-            var selectedEmployees = {};
-            var errors = [];
-            for (var i = 0; i < selectedProjects.length; ++i) {
-                var project = projects[selectedProjects[i]];
-
-                for (var j = 0; j < project.members.length; j++) {
-                    var empId = project.members[j];
-                    selectedEmployees[empId] = employees[empId];
-
-                    //check for conflicts
-                    if (typeof selectedEmployees[empId] !== "undefined") {
-                        //    selectedEmployees[empId].color = project.color;
-                        selectedEmployees[empId] == null;
-                    }
-
-                    else {
-                        errors.push(empId + " ");             
+                        else {
+                            errors.push(empId + " ");
+                        }
                     }
                 }
+                var errorNames = showerrors(errors);
+                appendfooter(selectedProjects, errorNames);
+
+                return selectedEmployees;
             }
-            var errorNames = showerrors(errors);
-            appendfooter(selectedProjects, errorNames);
-
-            return selectedEmployees;
-        }
 
 
-        //return employee object with name, address and cordinates
-        var getMapFriendlyEmpList = function (employees, type) {
+            //return employee object with name, address and cordinates
+            var getMapFriendlyEmpList = function (employees, type) {
 
-            var mapFriendlyObjs = [];
+                var mapFriendlyObjs = [];
 
-            for (var i in employees) {
+                for (var i in employees) {
 
-                var employee = {};
-                if (typeof employees[i] !== "undefined") {
-                    employee.name = employees[i].firstName;
-                    var num = employees[i].addresses[type].number;
-                    var street = employees[i].addresses[type].street;
-                    var city = employees[i].addresses[type].city;
-                    var district = employees[i].addresses[type].district;
-                    employee.address = num + " " + street + " " + city + " " + district;
-                    employee.coordinate = employees[i].addresses[type].coordinate;
+                    var employee = {};
+                    if (typeof employees[i] !== "undefined") {
+                        employee.name = employees[i].firstName;
+                        var num = employees[i].addresses[type].number;
+                        var street = employees[i].addresses[type].street;
+                        var city = employees[i].addresses[type].city;
+                        var district = employees[i].addresses[type].district;
+                        employee.address = num + " " + street + " " + city + " " + district;
+                        employee.coordinate = employees[i].addresses[type].coordinate;
 
-                    mapFriendlyObjs.push(employee);
+                        mapFriendlyObjs.push(employee);
+                    }
+
                 }
-
+                return mapFriendlyObjs;
             }
-            return mapFriendlyObjs;
-        }
 
-        //add mismatched identities to the footer
-        var showerrors = function (errors) {
-            console.log("err" + errors.toString());
-            return errors;        
-        }
-
-        //on permanent address click
-        $('#perm').click(function () {
-
-            $('#temp').removeClass('highlightButton');
-            if ($(this).hasClass('highlightButton')) {
-                $(this).removeClass('highlightButton');
+            //add mismatched identities to the footer
+            var showerrors = function (errors) {
+                console.log("err" + errors.toString());
+                return errors;
             }
-            else
-                $(this).addClass('highlightButton');
 
-            var selectedProjects = getSelectedProjects();
+            //on permanent address click
+            $('#perm').click(function () {
 
-            var employees = getEmployees(selectedProjects);
+                $('#temp').removeClass('highlightButton');
+                if ($(this).hasClass('highlightButton')) {
+                    $(this).removeClass('highlightButton');
+                }
+                else
+                    $(this).addClass('highlightButton');
 
-            var mapFriendlyEmpList = getMapFriendlyEmpList(employees, 1);
+                var selectedProjects = getSelectedProjects();
 
-            loadtoMap(mapFriendlyEmpList);
-        });
+                var employees = getEmployees(selectedProjects);
 
+                var mapFriendlyEmpList = getMapFriendlyEmpList(employees, 1);
 
-        //on residential address click
-        $('#temp').click(function () {
-
-            $('#perm').removeClass('highlightButton');
-            if ($(this).hasClass('highlightButton')) {
-                $(this).removeClass('highlightButton')
-            }
-            else
-                $(this).addClass('highlightButton');
-
-            var selectedProjects = getSelectedProjects();
-
-            var employees = getEmployees(selectedProjects);
-
-            var mapFriendlyEmpList = getMapFriendlyEmpList(employees, 0);
-
-            loadtoMap(mapFriendlyEmpList);
-        });
-
-
-        // window resizing
-        $(function () {
-            resizeDiv()
-            $(document).resize(function () {
-                resizeDiv();
+                loadtoMap(mapFriendlyEmpList);
             });
 
-            function resizeDiv() {
-                var windowHeight = $(document).height();
-                $('#map_canvas').height(windowHeight - 89);
+
+            //on residential address click
+            $('#temp').click(function () {
+
+                $('#perm').removeClass('highlightButton');
+                if ($(this).hasClass('highlightButton')) {
+                    $(this).removeClass('highlightButton')
+                }
+                else
+                    $(this).addClass('highlightButton');
+
+                var selectedProjects = getSelectedProjects();
+
+                var employees = getEmployees(selectedProjects);
+
+                var mapFriendlyEmpList = getMapFriendlyEmpList(employees, 0);
+
+                loadtoMap(mapFriendlyEmpList);
+            });
+
+
+            // window resizing
+            $(function () {
+                resizeDiv()
+                $(document).resize(function () {
+                    resizeDiv();
+                });
+
+                function resizeDiv() {
+                    var windowHeight = $(document).height();
+                    $('#map_canvas').height(windowHeight);
+                }
+            });
+
+
+            //window.onload = appendfooter;
+            /*function appendfooter(selectedprojects) {
+                var names = selectedprojects;
+                $('<p>project</p>').appendTo('#footer');
+            }*/
+
+            function appendfooter(selectedprojects, errorNames) {
+                var footer = "<p><b>Selected Projects :  </b>" + selectedprojects + "</p><p><b> Identity Mismatch : </b>" + errorNames + "</p>"
+                $("#footerDivPro").empty();
+                $("#footerDivPro").append(footer);
             }
-        });
-
-
-        //window.onload = appendfooter;
-        function appendfooter(selectedprojects) {
-            var names = selectedprojects;      
-            $('<p>project</p>').appendTo('#footer');
-        }
-
-        function appendfooter(selectedprojects, errorNames) {
-            var footer = "<div id='footerDivPro'><p><b>Selected Projects :  </b>" + selectedprojects + "</p><p><b> Identity Mismatch : </b>" + errorNames + "</p></div>"
-            $("body").append(footer);
-        }
-        window.onload = appendfooter("None", "None");
-    </script>
+            window.onload = appendfooter("None", "None");
+        </script>
 
 </body>
 </html>

@@ -1,13 +1,35 @@
 ﻿
+var mapOptions = {
+    center: new google.maps.LatLng(8.0000, 81.0000),
+    zoom: 8,
+    scrollwheel: false,
+    mapTypeId: 'roadmap',
+    panControl: false,
+    mapTypeControlOptions: {
+        style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+        position: google.maps.ControlPosition.RIGHT_CENTER
+    },
+    zoomControlOptions: {
+        style: google.maps.ZoomControlStyle.LARGE,
+        position: google.maps.ControlPosition.RIGHT_CENTER
+    },
+    streetViewControl: true,
+    streetViewControlOptions: {
+        position: google.maps.ControlPosition.RIGHT_CENTER
+    },
+    panControl: true,
+    panControlOptions: {
+        position: google.maps.ControlPosition.LEFT_CENTER
+    },
+    scaleControl: true,
+    scaleControlOptions: {
+        position: google.maps.ControlPosition.LEFT_CENTER
+    }
+};
+
 $(function () {
 
-    var map = new google.maps.Map(document.getElementById("map_canvas"),
-	{
-	    center: new google.maps.LatLng(8.0000, 81.0000),
-	    zoom: 8,
-	    scrollwheel: false,
-	    mapTypeId: 'roadmap'
-	});
+    var map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
     var infoWindow = new google.maps.InfoWindow;
 
 });
@@ -22,15 +44,7 @@ function loadtoMap(mapArray) {
     var map_canvas = document.getElementById('map_canvas');
     var map = new google.maps.Map(map_canvas, mapOptions);
 
-
-    var mapOptions = {
-        zoom: 8,
-        center: new google.maps.LatLng(8.0000, 81.0000),
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-    }
-
-
-    var map = new google.maps.Map(map_canvas, mapOptions);
+    //var map = new google.maps.Map(map_canvas, mapOptions);
 
 
     var marker;
@@ -81,12 +95,6 @@ function loadtoMap(mapArray) {
 }
 
 var clear = function () {
-    console.log("k");
-    var mapOptions = {
-        zoom: 8,
-        center: new google.maps.LatLng(8.0000, 81.0000),
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-    }
     map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
 }
 
