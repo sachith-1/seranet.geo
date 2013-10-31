@@ -110,10 +110,6 @@
               $(this).find('li').slideUp();
           }
 
-
-
-
-
       }
       );
         //$('#projectsMenu').onclick(function () {
@@ -236,7 +232,8 @@
                     }
                 }
             }
-            showerrors(errors);
+            var errorNames = showerrors(errors);
+            appendfooter(selectedProjects, errorNames);
             //  console.log(selectedEmployees);
             return selectedEmployees;
         }
@@ -268,7 +265,8 @@
 
         var showerrors = function (errors) {
             console.log("err" + errors.toString());
-            return "errors";
+
+            return errors;
             // alert(errors.toString() + " " + "Not Found");
         }
         //on permanent address click
@@ -339,9 +337,9 @@
         }
 
 
-        function appendfooter(selectedprojects, showerrors) {
+        function appendfooter(selectedprojects, errorNames) {
 
-            var footer = "<div id='footerDivPro'><p><b>Selected Projects :  </b>" + selectedprojects + "</p><p><b> Identity Mismatch : </b>" + showerrors + "</p></div>"
+            var footer = "<div id='footerDivPro'><p><b>Selected Projects :  </b>" + selectedprojects + "</p><p><b> Identity Mismatch : </b>" + errorNames + "</p></div>"
             $("body").append(footer);
         }
         window.onload = appendfooter("None", "None");
