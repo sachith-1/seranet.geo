@@ -19,14 +19,12 @@
     <link rel="stylesheet" href="styles/bootstrap-3.0.0.min.css" type="text/css">
     <link rel="stylesheet" href="styles/bootstrap-multiselect.css" type="text/css">
 
-    
-    <!--<link href="styles/bootmetro.css" rel="stylesheet" />-->
 
     <!-- Custom CSS -->
     <link href="styles/custom.css" rel="stylesheet" />
 
     <script src="scripts/vendor/modernizr-2.6.2.min.js"></script>
-    <!--<script src="scripts/MultiSelect.js"></script>-->
+   
 
 </head>
 <body>
@@ -42,29 +40,19 @@
         </div>
        <!-- <link href="styles/MultiSelect.css" rel="stylesheet" />-->
         <div id="rightSide" class="clearfix">
-            <div id="projectDrop" class="MultiSelect">
-                
-                
+            <div id="projectDrop" class="MultiSelect">                              
                 <select id="projectsMenu" multiple="multiple"></select>
-
-                <!--<div id="wrapper">
-                                  
-                <a id="all" class="linkStyle" href="#"  style="float:left;margin-top:50px" onclick="selectAll(); " >Select All</a>
-                <a id="clear" class="linkStyle" href="#"  style="float:left;margin-top:50px;padding-left:120px" onclick="clearAll(); " >Reset</a>
-                    
-            </div>-->
+            
             </div>
             
-            <!--<script src="scripts/vendor/mul.js"></script>-->
-
+      
             <div class="optionsButtons clearfix">
                 <button id="perm" class="btn btn-primary" value="click">Permanent Address</button>
                 <button id="temp" class="btn btn-primary" value="click">Residential Address</button>
                 
-                <a id="clear" class="linkStyle btn-primary-red" href="#" onclick="clearAll(); " >Reset</a>
+                <!--<a id="clear" class="linkStyle btn-primary-red" href="#" onclick="clearAll(); " >Reset</a>-->
             </div>
-           
-            
+                      
         </div>
     </div>
     <div id="map_canvas">
@@ -75,58 +63,25 @@
  	<!-- Boots trap -->
  	<script type="text/javascript" src="scripts/bootstrap-3.0.0.min.js"></script>
 	<script type="text/javascript" src="scripts/bootstrap-multiselect.js"></script>
-    <script type="text/javascript" src="scripts/prettify.js"></script>
+    <!--<script type="text/javascript" src="scripts/prettify.js"></script>-->
     
     <script type="text/javascript">
-        /*$('#projectsMenu').multiselect({
-			includeSelectAllOption: true
-		});*/
+     
     </script>
-    
-    <!--scripts
-    <script src="scripts/bootstrap.js"></script>
-    <script src="scripts/bootstrap.min.js"></script>
-    -->
+  
     <script src="scripts/colors.js"></script>
     <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <script src="scripts/vendor/label.js"></script>
-
-
 
     <!--map-->
     <script src="scripts/mapLoader.js"></script>
 
     <script>
 
-
-
-        $('#projectsMenu').on(
-      {
-          mouseover: function () {
-              $(this).find('li').slideDown();
-          },
-
-          mouseleave: function () {
-              $(this).find('li').slideUp();
-          }
-
-      }
-      );
-        //$('#projectsMenu').onclick(function () {
-        //    $(this).toggle();
-        //});
-
-        //var selectAll = function () {
-        //    console.log("click");
-        //    $(".checkbox").attr('checked', true);
-        //   // $("#clear").attr('checked', false);
-        //}
-
         var clearAll = function () {
 
-            $(".projectchk").attr('checked', false);
-            //  $("#all").attr('checked', false);
-            // var arrayClear = [];
+            $(".checkbox").attr('checked', false);
+          
             clear();
 
         }
@@ -176,8 +131,9 @@
         var createMenu = function () {
             for (var index in projects) {
                 var project = projects[index];
-                //var menuItem = $('<option value="'+project.name+'">'+project.name+'</option>');
-                $('#projectsMenu').append($('<option class="check"></option>').attr('value', project.name).text(project.name));
+              
+                $('#projectsMenu').append($('<option></option>').attr('value', project.name).text(project.name));
+               
                 //to add image :  <img class="" src="images/adraicon.png">
             };
             $('#projectsMenu').multiselect({
@@ -203,7 +159,6 @@
         }
 
 
-
         //get employees of selected projects
         var getEmployees = function (selectedProjects) {
 
@@ -213,28 +168,23 @@
                 var project = projects[selectedProjects[i]];
 
                 for (var j = 0; j < project.members.length; j++) {
-
                     var empId = project.members[j];
-
                     selectedEmployees[empId] = employees[empId];
-
 
                     //check for conflicts
                     if (typeof selectedEmployees[empId] !== "undefined") {
                         //    selectedEmployees[empId].color = project.color;
                         selectedEmployees[empId] == null;
-
                     }
 
                     else {
-                        errors.push(empId + " ");
-                        //  alert(empId + " "+ "Not Found!");
+                        errors.push(empId + " ");             
                     }
                 }
             }
             var errorNames = showerrors(errors);
             appendfooter(selectedProjects, errorNames);
-            //  console.log(selectedEmployees);
+
             return selectedEmployees;
         }
 
@@ -263,23 +213,21 @@
             return mapFriendlyObjs;
         }
 
+        //add mismatched identities to the footer
         var showerrors = function (errors) {
             console.log("err" + errors.toString());
-
-            return errors;
-            // alert(errors.toString() + " " + "Not Found");
+            return errors;        
         }
+
         //on permanent address click
         $('#perm').click(function () {
 
             $('#temp').removeClass('highlightButton');
-
             if ($(this).hasClass('highlightButton')) {
                 $(this).removeClass('highlightButton');
             }
             else
                 $(this).addClass('highlightButton');
-
 
             var selectedProjects = getSelectedProjects();
 
@@ -294,15 +242,12 @@
         //on residential address click
         $('#temp').click(function () {
 
-
             $('#perm').removeClass('highlightButton');
-
             if ($(this).hasClass('highlightButton')) {
                 $(this).removeClass('highlightButton')
             }
             else
                 $(this).addClass('highlightButton');
-
 
             var selectedProjects = getSelectedProjects();
 
@@ -330,24 +275,16 @@
 
         //window.onload = appendfooter;
         function appendfooter(selectedprojects) {
-            var names = selectedprojects;
-            console.log(selectedprojects);
-            //    $('#footer').appendTo('<div style="width:100%">"+selectedprojects+"</div>');
+            var names = selectedprojects;      
             $('<p>project</p>').appendTo('#footer');
         }
 
-
         function appendfooter(selectedprojects, errorNames) {
-
             var footer = "<div id='footerDivPro'><p><b>Selected Projects :  </b>" + selectedprojects + "</p><p><b> Identity Mismatch : </b>" + errorNames + "</p></div>"
             $("body").append(footer);
         }
         window.onload = appendfooter("None", "None");
     </script>
 
-
-    <!--<div id="footer" style='position:fixed;bottom:0px;background-color:darkseagreen;width:100%;height:50px'>
-      
-    </div>-->
 </body>
 </html>
